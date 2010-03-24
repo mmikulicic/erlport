@@ -36,6 +36,7 @@ __author__ = "Dmitry Vasiliev <dima@hlabs.spb.ru>"
 from struct import pack, unpack
 from array import array
 from zlib import decompressobj, compress
+from datetime import datetime
 
 # optional support for xmlrpclib datetime
 try:
@@ -346,15 +347,16 @@ def encode_term(term,
         # encode dict as proplist, but will be orddict compatible if keys
         # are all of the same type.
         return encode_term(sorted(term.iteritems()))
-    elif xmlrpclib and isinstance(term, xmlrpclib.DateTime):
-        tt = term.timetuple()
-        y = tt.tm_year
-        m = tt.tm_mon
-        d = tt.tm_mday
-        h = tt.tm_hour
-        mi = tt.tm_min
-        s = tt.tm_sec
+    elif isinstance(term, datetime):
+        y = term.year
+        m = term.month
+        d = term.day
+        h = term.hour
+        mi = term.minute
+        s = term.second
         return encode_term(((y,m,d),(h,mi,s)))
+    elif xmlrpclib and isinstance(term, xmlrpclib.DateTime):
+        return encode(datetime.strptime(term.value, "%Y%m%dT%H:%M:%S"))
     elif term is None:
         return pack(">BH", 100, 4) + "none"
 
