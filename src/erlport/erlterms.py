@@ -356,7 +356,7 @@ def encode_term(term,
         s = term.second
         return encode_term(((y,m,d),(h,mi,s)))
     elif xmlrpclib and isinstance(term, xmlrpclib.DateTime):
-        return encode(datetime.strptime(term.value, "%Y%m%dT%H:%M:%S"))
+        return encode_term(datetime.strptime(term.value, "%Y%m%dT%H:%M:%S"))
     elif term is None:
         return pack(">BH", 100, 4) + "none"
 
