@@ -37,6 +37,11 @@ from struct import pack, unpack
 from array import array
 from zlib import decompressobj, compress
 
+# optional support for xmlrpclib datetime
+try:
+    import xmlrpclib
+except:
+    xmlrpclib = None
 
 class IncompleteData(ValueError):
     """Need more data."""
@@ -341,6 +346,15 @@ def encode_term(term,
         # encode dict as proplist, but will be orddict compatible if keys
         # are all of the same type.
         return encode_term(sorted(term.iteritems()))
+    elif xmlrpclib and isinstance(term, xmlrpclib.DateTime):
+        tt = term.timetuple()
+        y = tt.tm_year
+        m = tt.tm_mon
+        d = tt.tm_mday
+        h = tt.tm_hour
+        mi = tt.tm_min
+        s = tt.tm_sec
+        return encode_term(((y,m,d),(h,mi,s)))
     elif term is None:
         return pack(">BH", 100, 4) + "none"
 
